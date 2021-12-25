@@ -7,9 +7,7 @@
   outputs = { self, nixpkgs, flake-utils }:
     let
       supportedSystems = [
-        "aarch64-darwin"
         "aarch64-linux"
-        "x86_64-darwin"
         "x86_64-linux"
       ];
     in
@@ -17,9 +15,9 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
       in
-      rec {
+      {
         packages.pterodactyl-wings = pkgs.callPackage ./wings.nix { };
-        defaultPackage = packages.pterodactyl-wings;
+        packages.dockerImage = pkgs.callPackage ./wings-docker.nix { inherit (self.packages.${system}) pterodactyl-wings; };
+        defaultPackage = self.packages.${system}.pterodactyl-wings;
       });
-
 }
