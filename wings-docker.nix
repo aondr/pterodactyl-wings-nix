@@ -49,6 +49,7 @@ dockerTools.buildImage {
       WINGS_USERNAME = wingsUser;
     };
     Volumes = lib.listToAttrs (map (p: { name = p; value = { }; }) [
+      "/var/lib/pterodactyl"
       "/var/log/pterodactyl"
     ]);
     Entrypoint = [ "/usr/bin/dumb-init" "--" ];
@@ -56,7 +57,7 @@ dockerTools.buildImage {
   };
 
   extraCommands = ''
-    mkdir -p bin etc/ssl/certs etc/pki/tls/certs sbin usr/bin usr/lib var/log/pterodactyl
+    mkdir -p bin etc/ssl/certs etc/pki/tls/certs sbin usr/bin usr/lib var/lib/pterodactyl var/log/pterodactyl
     ln -s ${bash}/bin/bash bin/sh
     ln -s ${coreutils}/bin/env usr/bin/env
     ln -s ${dumb-init}/bin/dumb-init usr/bin/dumb-init
