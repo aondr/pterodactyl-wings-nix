@@ -13,4 +13,8 @@ buildGoModule rec {
 
   vendorSha256 = "sha256-QE5nBhWRMJRyYbipviDjVaZmHorVQrDhNHahGKSvfa0=";
   subPackages = [ "." ];
+
+  ldflags = [
+    "-X github.com/pterodactyl/wings/system.Version=${version}"
+  ];
 }
