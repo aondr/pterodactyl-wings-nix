@@ -20,7 +20,7 @@
         packages.pterodactyl-wings = pkgs.callPackage ./wings.nix { };
         packages.dockerImage = pkgs.callPackage ./wings-docker.nix {
           inherit (self.packages.${system}) pterodactyl-wings;
-          inherit (docker-tools.lib) shadowSetup;
+          inherit (docker-tools.lib) shadowSetup dockerConfig;
         };
         defaultPackage = self.packages.${system}.pterodactyl-wings;
       });

@@ -1,4 +1,5 @@
 { lib
+, dockerConfig
 , dockerTools
 , bash
 , cacert
@@ -19,17 +20,17 @@ in
 dockerTools.buildImage {
   name = "pterodactyl-wings";
   config = {
-    Env = lib.mapAttrsToList (k: v: "${k}=${toString v}") {
+    Env = dockerConfig.env {
       TZDIR = "/etc/zoneinfo";
       TZ = "UTC";
       WINGS_UID = wingsUid;
       WINGS_GID = wingsGid;
       WINGS_USERNAME = wingsUser;
     };
-    Volumes = lib.listToAttrs (map (p: { name = p; value = { }; }) [
+    Volumes = dockerConfig.volumes [
       "/var/lib/pterodactyl"
       "/var/log/pterodactyl"
-    ]);
+    ];
     Entrypoint = [ "/usr/bin/dumb-init" "--" ];
     Cmd = [ "/usr/bin/wings" "--config" "/etc/pterodactyl/config.yml" ];
   };
