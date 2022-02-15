@@ -2,14 +2,16 @@
   "nodes": {
     "docker-tools": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
-        "lastModified": 1644504900,
-        "narHash": "sha256-Mehf8SwDMNj2RouhfrWAXfNlR6iFFJVzA0wJP4IaZqc=",
+        "lastModified": 1644953486,
+        "narHash": "sha256-sXMeN/VGcpn6cGw+CRQzDX226v3wpwXGgD9WFh44yXI=",
         "owner": "ZentriaMC",
         "repo": "docker-tools",
-        "rev": "09b04b52784929752d21cf2889e667011e9813fa",
+        "rev": "158e8a76cae65a7f843a4623a73e9d95564859de",
         "type": "github"
       },
       "original": {
@@ -49,27 +51,11 @@
         "type": "github"
       }
     },
-    "nixpkgs_2": {
-      "locked": {
-        "lastModified": 1644453163,
-        "narHash": "sha256-VPlXtIsShceYHUspnJSvuvucrX1OWVFmrqiofn69yCM=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "7e003d7fb9eff8ecb84405360c75c716cdd1f79f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixpkgs-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "docker-tools": "docker-tools",
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs"
       }
     }
   },

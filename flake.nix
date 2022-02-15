@@ -1,9 +1,13 @@
 {
   description = "Pterodactyl Wings";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-  inputs.flake-utils.url = "github:numtide/flake-utils";
-  inputs.docker-tools.url = "github:ZentriaMC/docker-tools";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+    docker-tools.url = "github:ZentriaMC/docker-tools";
+
+    docker-tools.inputs.nixpkgs.follows = "nixpkgs";
+  };
 
   outputs = { self, nixpkgs, flake-utils, docker-tools }:
     let
@@ -20,7 +24,9 @@
         packages.pterodactyl-wings = pkgs.callPackage ./wings.nix { };
         packages.dockerImage = pkgs.callPackage ./wings-docker.nix {
           inherit (self.packages.${system}) pterodactyl-wings;
-          inherit (docker-tools.lib) shadowSetup dockerConfig;
+          inherit (docker-tools.lib) dockerConfig setupFHSScript symlinkCACerts;
+
+          shadowLib = docker-tools.lib.shadow;
         };
         defaultPackage = self.packages.${system}.pterodactyl-wings;
       });

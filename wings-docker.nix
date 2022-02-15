@@ -6,16 +6,33 @@
 , coreutils
 , dumb-init
 , iana-etc
+, runCommandNoCC
 , shadow
-, shadowSetup
+, symlinkCACerts
+, setupFHSScript
+, shadowLib
 , tzdata
 , pterodactyl-wings
 }:
 
 let
-  wingsUid = "998";
-  wingsGid = "998";
+  wingsUid = 998;
+  wingsGid = 998;
   wingsUser = "pterodactyl";
+
+  users = shadowLib.defaultUsers // {
+    "${wingsUser}" = {
+      uid = 998;
+    };
+  };
+
+  groups = shadowLib.defaultGroups // {
+    "${wingsUser}" = {
+      gid = 998;
+    };
+  };
+
+  inherit (shadowLib) setupUsers setupUsersScript;
 in
 dockerTools.buildImage {
   name = "pterodactyl-wings";
@@ -23,8 +40,8 @@ dockerTools.buildImage {
     Env = dockerConfig.env {
       TZDIR = "/etc/zoneinfo";
       TZ = "UTC";
-      WINGS_UID = wingsUid;
-      WINGS_GID = wingsGid;
+      WINGS_UID = toString users.${wingsUser}.uid;
+      WINGS_GID = toString groups.${wingsUser}.gid;
       WINGS_USERNAME = wingsUser;
     };
     Volumes = dockerConfig.volumes [
@@ -35,27 +52,30 @@ dockerTools.buildImage {
     Cmd = [ "/usr/bin/wings" "--config" "/etc/pterodactyl/config.yml" ];
   };
 
-  extraCommands = ''
-    mkdir -p bin etc/ssl/certs etc/pki/tls/certs sbin usr/bin usr/lib var/lib/pterodactyl var/log/pterodactyl
-    ln -s ${bash}/bin/bash bin/sh
-    ln -s ${coreutils}/bin/env usr/bin/env
-    ln -s ${dumb-init}/bin/dumb-init usr/bin/dumb-init
-    ln -s ${pterodactyl-wings}/bin/wings usr/bin/wings
-    ln -s ${shadow}/bin/nologin sbin/nologin
-    ln -s ${tzdata}/share/zoneinfo etc/zoneinfo
-    ln -s etc/zoneinfo/UTC etc/localtime
-    echo "ID=distroless" > usr/lib/os-release # Will no-op user creation
-    ln -s usr/lib/os-release etc/os-release
-    ln -s ${iana-etc}/etc/protocols etc/protocols
-    ln -s ${iana-etc}/etc/services etc/services
-    ln -s ${cacert}/etc/ssl/certs/ca-bundle.crt etc/ssl/certs/ca-bundle.crt
-    ln -s ${cacert}/etc/ssl/certs/ca-bundle.crt etc/ssl/certs/ca-certificates.crt
-    ln -s ${cacert}/etc/ssl/certs/ca-bundle.crt etc/pki/tls/certs/ca-bundle.crt
-    ln -s ${cacert.p11kit}/etc/ssl/trust-source etc/ssl/trust-source
+  contents = [
+    dockerTools.usrBinEnv
+    (runCommandNoCC "wings-base" ((setupUsers { inherit users groups; }) // {
+      allowSubstitutes = false;
+      preferLocalBuild = true;
+    }) ''
+      for d in bin sbin usr/bin usr/lib var/lib/pterodactyl var/log/pterodactyl; do
+        mkdir -p $out/$d
+      done
 
-    ${shadowSetup { runtimeShell = "/bin/sh"; }}
-    echo "${wingsUser}:x:${wingsUid}:${wingsGid}::/:/sbin/nologin" >> etc/passwd
-    echo "${wingsUser}:x:${wingsGid}:" >> etc/group
-    echo "${wingsUser}:x::" >> etc/gshadow
-  '';
+      ${symlinkCACerts { inherit cacert; targetDir = "$out"; }}
+      ${setupUsersScript { }}
+
+      ln -s ${bash}/bin/bash $out/bin/sh
+      ln -s ${bash}/bin/bash $out/bin/bash
+      ln -s ${dumb-init}/bin/dumb-init $out/usr/bin/dumb-init
+      ln -s ${pterodactyl-wings}/bin/wings $out/usr/bin/wings
+
+      ln -s etc/zoneinfo/UTC $out/etc/localtime
+      echo "ID=distroless" > $out/usr/lib/os-release # Will no-op user creation
+      ln -s usr/lib/os-release $out/etc/os-release
+      ln -s ${iana-etc}/etc/protocols $out/etc/protocols
+      ln -s ${iana-etc}/etc/services $out/etc/services
+      ln -s ${tzdata}/share/zoneinfo $out/etc/zoneinfo
+    '')
+  ];
 }
