@@ -42,7 +42,7 @@ dockerTools.buildImage {
     ln -s ${dumb-init}/bin/dumb-init usr/bin/dumb-init
     ln -s ${pterodactyl-wings}/bin/wings usr/bin/wings
     ln -s ${shadow}/bin/nologin sbin/nologin
-    ln -s ${tzdata} etc/zoneinfo
+    ln -s ${tzdata}/share/zoneinfo etc/zoneinfo
     ln -s etc/zoneinfo/UTC etc/localtime
     echo "ID=distroless" > usr/lib/os-release # Will no-op user creation
     ln -s usr/lib/os-release etc/os-release
