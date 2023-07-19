@@ -1,5 +1,8 @@
-{ lib, buildGo120Module, fetchFromGitHub }:
-
+{
+  lib,
+  buildGo120Module,
+  fetchFromGitHub,
+}:
 buildGo120Module rec {
   pname = "pterodactyl-wings";
   version = "v1.11.6";
@@ -12,7 +15,7 @@ buildGo120Module rec {
   };
 
   vendorSha256 = "sha256-VApv+VSot/GmOyU3pBlOvHYG0oE3fCtTxN5F3PsYYf0=";
-  subPackages = [ "." ];
+  subPackages = ["."];
 
   ldflags = [
     "-X github.com/pterodactyl/wings/system.Version=${version}"
