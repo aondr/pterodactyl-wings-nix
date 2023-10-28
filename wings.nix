@@ -5,16 +5,16 @@
 }:
 buildGo120Module rec {
   pname = "pterodactyl-wings";
-  version = "v1.11.7";
+  version = "v1.11.8";
 
   src = fetchFromGitHub {
     owner = "pterodactyl";
     repo = "wings";
     rev = "${version}";
-    sha256 = "sha256-MWeUSlJsKNnV/oZotIne3KN3j+fjKNfPJQb+DbhNYLk=";
+    sha256 = "sha256-JzbxROashDAL4NSeqMcWR9PgFqe9peBNpeofA347oE4=";
   };
 
-  vendorSha256 = "sha256-3jJQQEb2N28dhXJg5knzZgfnwXUOqnouRvedpTY23jw=";
+  vendorSha256 = "sha256-fn+U91jX/rmL/gdMwRAIDEj/m0Zqgy81BUyv4El7Qxw=";
   subPackages = ["."];
 
   ldflags = [
