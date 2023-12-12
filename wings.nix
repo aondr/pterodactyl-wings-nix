@@ -14,7 +14,7 @@ buildGo120Module rec {
     sha256 = "sha256-JzbxROashDAL4NSeqMcWR9PgFqe9peBNpeofA347oE4=";
   };
 
-  vendorSha256 = "sha256-fn+U91jX/rmL/gdMwRAIDEj/m0Zqgy81BUyv4El7Qxw=";
+  vendorHash = "sha256-fn+U91jX/rmL/gdMwRAIDEj/m0Zqgy81BUyv4El7Qxw=";
   subPackages = ["."];
 
   ldflags = [
