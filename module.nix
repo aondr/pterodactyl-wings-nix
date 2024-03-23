@@ -64,16 +64,16 @@ in {
     ];
 
     users.users = lib.optionalAttrs (cfg.user == "pterodactyl") {
-      wings = {
-        name = "wings";
+      pterodactyl = {
+        name = "pterodactyl";
         group = cfg.group;
         isSystemUser = true;
       };
     };
 
     users.groups = lib.optionalAttrs (cfg.group == "pterodactyl") {
-      wings = {
-        name = "wings";
+      pterodactyl = {
+        name = "pterodactyl";
       };
     };
 
