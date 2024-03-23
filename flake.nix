@@ -3,23 +3,29 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = {
     self,
     nixpkgs,
-    flake-utils,
   }: let
     supportedSystems = [
       "aarch64-linux"
       "x86_64-linux"
     ];
-  in
-    flake-utils.lib.eachSystem supportedSystems (system: let
-      pkgs = nixpkgs.legacyPackages.${system};
-    in {
-      packages.pterodactyl-wings = pkgs.callPackage ./wings.nix {};
-      packages.default = self.packages.${system}.pterodactyl-wings;
-    });
+    forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
+  in {
+    nixosModules = {
+      pterodactyl-wings = import ./module.nix self;
+      default = self.nixosModules.pterodactyl-wings;
+    };
+    packages = forAllSystems (
+      system: let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in {
+        pterodactyl-wings = pkgs.callPackage ./wings.nix {};
+        default = self.packages.${system}.pterodactyl-wings;
+      }
+    );
+  };
 }
