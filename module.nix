@@ -19,12 +19,12 @@ in {
     user = lib.mkOption {
       type = lib.types.str;
       description = lib.mdDoc "The user to run the Pterodactyl Wings daemon as";
-      default = "wings";
+      default = "pterodactyl";
     };
     group = lib.mkOption {
       type = lib.types.str;
       description = lib.mdDoc "The group to run the Pterodactyl Wings daemon as";
-      default = "wings";
+      default = "pterodactyl";
     };
     tokenFile = lib.mkOption {
       type = lib.types.nullOr lib.types.path;
@@ -63,17 +63,17 @@ in {
       }
     ];
 
-    users.users = lib.optionalAttrs (cfg.user == "wings") {
-      wings = {
-        name = "wings";
+    users.users = lib.optionalAttrs (cfg.user == "pterodactyl") {
+      pterodactyl = {
+        name = "pterodactyl";
         group = cfg.group;
         isSystemUser = true;
       };
     };
 
-    users.groups = lib.optionalAttrs (cfg.group == "wings") {
-      wings = {
-        name = "wings";
+    users.groups = lib.optionalAttrs (cfg.group == "pterodactyl") {
+      pterodactyl = {
+        name = "pterodactyl";
       };
     };
 
@@ -81,6 +81,7 @@ in {
     systemd.tmpfiles.rules = [
       "d /var/log/pterodactyl 0700 ${cfg.user} ${cfg.group}"
       "d /var/lib/pterodactyl 0700 ${cfg.user} ${cfg.group}"
+      "d /etc/pterodactyl 0700 ${cfg.user} ${cfg.group}"
     ];
 
     systemd.services.wings = {
