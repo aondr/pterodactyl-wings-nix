@@ -5,12 +5,12 @@
 }:
 buildGo121Module rec {
   pname = "pterodactyl-wings";
-  version = "v1.11.10";
+  version = "1.11.10";
 
   src = fetchFromGitHub {
     owner = "pterodactyl";
     repo = "wings";
-    rev = "${version}";
+    rev = "v${version}";
     sha256 = "sha256-EOkHi+x4ciODyHPPx7766IEh8XGLHY4Ng1N/iq2mgJI=";
   };
 
