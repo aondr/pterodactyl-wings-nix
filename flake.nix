@@ -23,7 +23,7 @@
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
       in {
-        pterodactyl-wings = pkgs.callPackage ./wings.nix {};
+        pterodactyl-wings = pkgs.callPackage ./pterodactyl-wings.nix {};
         default = self.packages.${system}.pterodactyl-wings;
       }
     );
