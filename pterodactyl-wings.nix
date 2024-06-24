@@ -22,7 +22,7 @@ buildGo121Module rec {
   ];
 
   meta = with lib; {
-    description = " The server control plane for Pterodactyl Panel. Written from the ground-up with security, speed, and stability in mind.";
+    description = "The server control plane for Pterodactyl Panel. Written from the ground-up with security, speed, and stability in mind";
     homepage = "https://github.com/pterodactyl/wings";
     license = licenses.mit;
     mainProgram = "wings";

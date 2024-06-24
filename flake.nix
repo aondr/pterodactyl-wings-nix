@@ -24,6 +24,7 @@
         pkgs = nixpkgs.legacyPackages.${system};
       in {
         pterodactyl-wings = pkgs.callPackage ./pterodactyl-wings.nix {};
+        pelican-wings = pkgs.callPackage ./pelican-wings.nix {};
         default = self.packages.${system}.pterodactyl-wings;
       }
     );
