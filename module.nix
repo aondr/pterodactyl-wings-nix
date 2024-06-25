@@ -82,29 +82,43 @@ in {
       "d /var/log/pterodactyl 0700 ${cfg.user} ${cfg.group}"
       "d /var/lib/pterodactyl 0700 ${cfg.user} ${cfg.group}"
       "d /etc/pterodactyl 0700 ${cfg.user} ${cfg.group}"
+      # Pelican crap
+      "d /var/log/pelican 0700 ${cfg.user} ${cfg.group}"
+      "d /var/lib/pelican 0700 ${cfg.user} ${cfg.group}"
+      "d /etc/pelican 0700 ${cfg.user} ${cfg.group}"
     ];
 
     systemd.services.wings = {
       description = "Wings pterodactyl daemon";
       wantedBy = ["multi-user.target"];
-      preStart = lib.mkIf (cfg.tokenFile != null) ''
+      preStart =
+        lib.mkIf (cfg.tokenFile != null)
+        /*
+        bash
+        */
+        ''
 
-        mkdir -p /etc/pterodactyl
+          mkdir -p /etc/pterodactyl
 
-        token=$(cat ${cfg.tokenFile})
+          # Symlink all Pelican directories to point to Pterodactyl directories
+          ln -s /etc/pterodactyl /etc/pelican
+          ln -s /var/lib/pterodactyl /var/lib/pelican
+          ln -s /var/log/pterodactyl /var/log/pelican
 
-        cat > /etc/pterodactyl/config.yml << EOF
+          token=$(cat ${cfg.tokenFile})
 
-        token: $token
+          cat > /etc/pterodactyl/config.yml << EOF
 
-        ${builtins.readFile generatedConfig}
+          token: $token
 
-        EOF
+          ${builtins.readFile generatedConfig}
 
-               chown ${cfg.user}:${cfg.group} /etc/pterodactyl/config.yml
+          EOF
 
-        exit 0
-      ''; # Jank stuff to write the token to the config file before starting the service
+          chown ${cfg.user}:${cfg.group} /etc/pterodactyl/config.yml
+
+          exit 0
+        ''; # Jank stuff to write the token to the config file before starting the service
       serviceConfig = {
         User = cfg.user;
         Group = cfg.group;
