@@ -85,7 +85,7 @@ in {
     ];
 
     systemd.services.wings = {
-      description = "The server control plane for Pterodactyl Panel. Written from the ground-up with security, speed, and stability in mind.";
+      description = "Wings pterodactyl daemon";
       wantedBy = ["multi-user.target"];
       preStart = lib.mkIf (cfg.tokenFile != null) ''
 
