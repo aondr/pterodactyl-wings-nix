@@ -83,9 +83,9 @@ in {
       "d /var/lib/pterodactyl 0700 ${cfg.user} ${cfg.group}"
       "d /etc/pterodactyl 0700 ${cfg.user} ${cfg.group}"
       # Pelican crap
-      "d /var/log/pelican 0700 ${cfg.user} ${cfg.group}"
-      "d /var/lib/pelican 0700 ${cfg.user} ${cfg.group}"
-      "d /etc/pelican 0700 ${cfg.user} ${cfg.group}"
+      #"d /var/log/pelican 0700 ${cfg.user} ${cfg.group}"
+      #"d /var/lib/pelican 0700 ${cfg.user} ${cfg.group}"
+      #"d /etc/pelican 0700 ${cfg.user} ${cfg.group}"
     ];
 
     systemd.services.wings = {
@@ -101,9 +101,9 @@ in {
           mkdir -p /etc/pterodactyl
 
           # Symlink all Pelican directories to point to Pterodactyl directories
-          ln -sfn /etc/pterodactyl /etc/pelican
-          ln -sfn /var/lib/pterodactyl /var/lib/pelican
-          ln -sfn /var/log/pterodactyl /var/log/pelican
+          #ln -sfn /etc/pterodactyl /etc/pelican
+          #ln -sfn /var/lib/pterodactyl /var/lib/pelican
+          #ln -sfn /var/log/pterodactyl /var/log/pelican
 
           token=$(cat ${cfg.tokenFile})
 
