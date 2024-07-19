@@ -101,9 +101,9 @@ in {
           mkdir -p /etc/pterodactyl
 
           # Symlink all Pelican directories to point to Pterodactyl directories
-          ln -s /etc/pterodactyl /etc/pelican
-          ln -s /var/lib/pterodactyl /var/lib/pelican
-          ln -s /var/log/pterodactyl /var/log/pelican
+          ln -sfn /etc/pterodactyl /etc/pelican
+          ln -sfn /var/lib/pterodactyl /var/lib/pelican
+          ln -sfn /var/log/pterodactyl /var/log/pelican
 
           token=$(cat ${cfg.tokenFile})
 
