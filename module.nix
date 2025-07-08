@@ -10,39 +10,39 @@ self: {
   generatedConfig = format.generate "config.yml" cfg.config;
 in {
   options.services.wings = {
-    enable = lib.mkEnableOption (lib.mdDoc "Enable the Pelican Wings daemon");
+    enable = lib.mkEnableOption (lib.mdDoc "Enable the Pterodactyl Wings daemon");
     package = lib.mkOption {
       type = lib.types.package;
-      description = lib.mdDoc "The package to use for the Pelican Wings daemon";
-      default = self.packages.${pkgs.stdenv.hostPlatform.system}.pelican-wings;
+      description = lib.mdDoc "The package to use for the Pterodactyl Wings daemon";
+      default = self.packages.${pkgs.stdenv.hostPlatform.system}.pterodactyl-wings;
     };
     user = lib.mkOption {
       type = lib.types.str;
-      description = lib.mdDoc "The user to run the Pelican Wings daemon as";
-      default = "pelican";
+      description = lib.mdDoc "The user to run the Pterodactyl Wings daemon as";
+      default = "pterodactyl";
     };
     group = lib.mkOption {
       type = lib.types.str;
-      description = lib.mdDoc "The group to run the Pelican Wings daemon as";
-      default = "pelican";
+      description = lib.mdDoc "The group to run the Pterodactyl Wings daemon as";
+      default = "pterodactyl";
     };
     tokenFile = lib.mkOption {
       type = lib.types.nullOr lib.types.path;
       default = null;
-      description = lib.mdDoc "The file to store the Pelican Wings daemon token in";
+      description = lib.mdDoc "The file to store the Pterodactyl Wings daemon token in";
     };
     configFile = lib.mkOption {
       type = lib.types.nullOr lib.types.path;
-      description = lib.mdDoc "The path to the Pelican Wings daemon configuration file";
+      description = lib.mdDoc "The path to the Pterodactyl Wings daemon configuration file";
       default = null;
     };
     config = lib.mkOption {
       type = lib.types.nullOr format.type;
       default = null;
       description = lib.mdDoc ''
-        The configuration for the Pelican Wings daemon
-        Refer to <https://github.com/pelican/wings/blob/develop/config/config.go#L64-L329> for all available options
-      ''; # Pelican doesn't seem to have any documentation on the configuration options
+        The configuration for the Pterodactyl Wings daemon
+        Refer to <https://github.com/pterodactyl/wings/blob/develop/config/config.go#L64-L329> for all available options
+      ''; # Pterodactyl doesn't seem to have any documentation on the configuration options
     };
   };
   config = lib.mkIf cfg.enable {
@@ -54,7 +54,7 @@ in {
       ''
       ++ lib.optional (!config.virtualisation.docker.enable && !config.virtualisation.podman.enable)
       ''
-        services.wings: Neither Docker nor Podman is enabled on this system. Pelican Wings requires a container runtime to function properly.
+        services.wings: Neither Docker nor Podman is enabled on this system. Pterodactyl Wings requires a container runtime to function properly.
       '';
     assertions = [
       {
@@ -63,29 +63,33 @@ in {
       }
     ];
 
-    users.users = lib.optionalAttrs (cfg.user == "pelican") {
-      pelican = {
-        name = "pelican";
+    users.users = lib.optionalAttrs (cfg.user == "pterodactyl") {
+      pterodactyl = {
+        name = "pterodactyl";
         group = cfg.group;
         isSystemUser = true;
       };
     };
 
-    users.groups = lib.optionalAttrs (cfg.group == "pelican") {
-      pelican = {
-        name = "pelican";
+    users.groups = lib.optionalAttrs (cfg.group == "pterodactyl") {
+      pterodactyl = {
+        name = "pterodactyl";
       };
     };
 
     # Should this only be applied based on an option? Check cfg.config if these directories exist or are default?
     systemd.tmpfiles.rules = [
-      "d /var/log/pelican 0700 ${cfg.user} ${cfg.group}"
-      "d /var/lib/pelican 0700 ${cfg.user} ${cfg.group}"
-      "d /etc/pelican 0700 ${cfg.user} ${cfg.group}"
+      "d /var/log/pterodactyl 0700 ${cfg.user} ${cfg.group}"
+      "d /var/lib/pterodactyl 0700 ${cfg.user} ${cfg.group}"
+      "d /etc/pterodactyl 0700 ${cfg.user} ${cfg.group}"
+      # Pelican crap
+      #"d /var/log/pelican 0700 ${cfg.user} ${cfg.group}"
+      #"d /var/lib/pelican 0700 ${cfg.user} ${cfg.group}"
+      #"d /etc/pelican 0700 ${cfg.user} ${cfg.group}"
     ];
 
     systemd.services.wings = {
-      description = "Wings pelican daemon";
+      description = "Wings pterodactyl daemon";
       wantedBy = ["multi-user.target"];
       preStart =
         lib.mkIf (cfg.tokenFile != null)
@@ -94,11 +98,16 @@ in {
         */
         ''
 
-          mkdir -p /etc/pelican
+          mkdir -p /etc/pterodactyl
+
+          # Symlink all Pelican directories to point to Pterodactyl directories
+          #ln -sfn /etc/pterodactyl /etc/pelican
+          #ln -sfn /var/lib/pterodactyl /var/lib/pelican
+          #ln -sfn /var/log/pterodactyl /var/log/pelican
 
           token=$(cat ${cfg.tokenFile})
 
-          cat > /etc/pelican/config.yml << EOF
+          cat > /etc/pterodactyl/config.yml << EOF
 
           token: $token
 
@@ -106,7 +115,7 @@ in {
 
           EOF
 
-          chown ${cfg.user}:${cfg.group} /etc/pelican/config.yml
+          chown ${cfg.user}:${cfg.group} /etc/pterodactyl/config.yml
 
           exit 0
         ''; # Jank stuff to write the token to the config file before starting the service
@@ -115,7 +124,7 @@ in {
         Group = cfg.group;
         ExecStart = "${cfg.package}/bin/wings --config ${
           if cfg.tokenFile != null
-          then "/etc/pelican/config.yml"
+          then "/etc/pterodactyl/config.yml"
           else if cfg.configFile != null
           then cfg.configFile
           else generatedConfig
