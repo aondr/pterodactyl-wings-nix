@@ -15,6 +15,10 @@
     ];
     forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
   in {
+    nixosModules = {
+      pelican-wings = import ./module.nix self;
+      default = self.nixosModules.pelican-wings;
+    };
     packages = forAllSystems (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
